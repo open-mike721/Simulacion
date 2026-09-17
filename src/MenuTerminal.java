@@ -18,7 +18,7 @@ public class MenuTerminal {
     public void ejecutar() {
         System.out.println("======================================");
         System.out.println(" ¡Bienvenido! Generadores de Números");
-        System.out.println("     Pseudoaleatorios (RNG)");
+        System.out.println("     Pseudoaleatorios");
         System.out.println("======================================");
 
         boolean salir = false;
