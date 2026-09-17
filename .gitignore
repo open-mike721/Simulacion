@@ -4,6 +4,11 @@ out/
 !**/src/test/**/out/
 .kotlin
 
+### Compilación / JAR ###
+build/
+*.jar
+!simulacion-rng.jar
+
 ### Eclipse ###
 .apt_generated
 .classpath
