@@ -1,4 +1,4 @@
-# Generadores de Números Pseudoaleatorios4
+# SIMULACION
 
 ![Java](https://img.shields.io/badge/Java-17%2B-orange?logo=java)
 ![Plataforma](https://img.shields.io/badge/Plataforma-CLI-lightgrey)
