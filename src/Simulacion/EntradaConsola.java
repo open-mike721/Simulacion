@@ -1,3 +1,5 @@
+package Simulacion;
+
 import GeneradoresDeNumerosPseudoaleatorios.SemillaInvalidaException;
 
 import java.util.Scanner;

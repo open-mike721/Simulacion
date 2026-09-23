@@ -1,3 +1,5 @@
+package Simulacion;
+
 import GeneradoresDeNumerosPseudoaleatorios.GeneradorBase;
 
 import java.util.ArrayList;

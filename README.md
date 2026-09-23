@@ -1,4 +1,4 @@
-# Generadores de Números Pseudoaleatorios
+# Generadores de Números Pseudoaleatorios4
 
 ![Java](https://img.shields.io/badge/Java-17%2B-orange?logo=java)
 ![Plataforma](https://img.shields.io/badge/Plataforma-CLI-lightgrey)
@@ -14,11 +14,14 @@ interfaz interactiva por menú, tabla de resultados y exportación a **CSV**.
 
 - **Menú principal interactivo** con opciones numeradas y validación de errores
   de entrada (nunca se cae por un dato incorrecto).
-- **Cuatro generadores clásicos**:
+- **Cinco generadores clásicos**:
   - 🟦 Método de **Cuadrados Medios**
   - 🟨 Método de **Productos Medios**
   - 🟪 Método de **Multiplicación Constante**
   - 🟩 Método **Congruencial Lineal**
+  - 🟧 Método **Congruencial Aditivo**
+- **Tarjeta de Pruebas Estadísticas** en el menú (módulo en construcción, con
+  paquete `PruebasEstadisticas` reservado para él).
 - **Semillas flexibles**: cualquier número de máximo 9 dígitos (en Productos
   Medios, ambas semillas deben tener el mismo tamaño).
 - **Dígitos adaptativos**: los métodos de dígitos centrales ajustan el número
@@ -36,21 +39,25 @@ interfaz interactiva por menú, tabla de resultados y exportación a **CSV**.
 
 ```
 src/
-├── Main.java                                          # Punto de entrada
-├── MenuTerminal.java                                  # Menú e interfaz de terminal
-├── EntradaConsola.java                                # Lectura y validación de entradas
-├── GeneradorSecuencia.java                            # Generación de filas y detección de ciclos
-├── TablaResultados.java                               # Tabla en consola y exportación CSV
-├── Fila.java                                          # Registro de una fila de la tabla
-└── GeneradoresDeNumerosPseudoaleatorios/
-    ├── GeneradorBase.java                             # Clase base abstracta
-    ├── CuadradosMedios.java                           # Método de Cuadrados Medios
-    ├── ProductosMedios.java                           # Método de Productos Medios
-    ├── MultiplicacionConstante.java                   # Método de Multiplicación Constante
-    ├── CongruencialLineal.java                        # Método Congruencial Lineal
-    ├── NumerosUtil.java                               # Utilidades comunes (relleno, dígitos centrales…)
-    ├── SemillaInvalidaException.java                  # Excepción: semilla no válida
-    └── SemillasDiferenteLongitudException.java        # Excepción: semillas de tamaño distinto
+├── Simulacion/                                     # Paquete de la aplicación (menús e interfaz)
+│   ├── Main.java                                   # Punto de entrada
+│   ├── MenuPrincipal.java                          # Menú principal (SIMULACIÓN)
+│   ├── MenuTerminal.java                           # Menú de generadores
+│   ├── EntradaConsola.java                         # Lectura y validación de entradas
+│   ├── GeneradorSecuencia.java                     # Generación de filas y detección de ciclos
+│   ├── TablaResultados.java                        # Tabla en consola y exportación CSV
+│   └── Fila.java                                   # Registro de una fila de la tabla
+├── GeneradoresDeNumerosPseudoaleatorios/           # Los métodos de generación
+│   ├── GeneradorBase.java                          # Clase base abstracta
+│   ├── CuadradosMedios.java                        # Método de Cuadrados Medios
+│   ├── ProductosMedios.java                        # Método de Productos Medios
+│   ├── MultiplicacionConstante.java                # Método de Multiplicación Constante
+│   ├── CongruencialLineal.java                     # Método Congruencial Lineal
+│   ├── CongruencialAditivo.java                    # Método Congruencial Aditivo
+│   ├── NumerosUtil.java                            # Utilidades comunes (relleno, dígitos centrales…)
+│   ├── SemillaInvalidaException.java               # Excepción: semilla no válida
+│   └── SemillasDiferenteLongitudException.java     # Excepción: semillas de tamaño distinto
+└── PruebasEstadisticas/                            # Módulo de pruebas estadísticas (a implementar)
 ```
 
 ---
@@ -79,7 +86,7 @@ javac -version
 javac -encoding UTF-8 -d out/production $(find src -name '*.java')
 
 # 2. Ejecutar
-java -cp out/production Main
+java -cp out/production Simulacion.Main
 ```
 
 ### Windows (PowerShell)
@@ -89,7 +96,7 @@ java -cp out/production Main
 javac -encoding UTF-8 -d out $(Get-ChildItem src -Recurse -Name -Filter *.java | ForEach-Object { "src/$_" })
 
 # 2. Ejecutar
-java -cp out Main
+java -cp out Simulacion.Main
 ```
 
 ---
@@ -108,7 +115,7 @@ mkdir -p build/classes
 javac -encoding UTF-8 -d build/classes $(find src -name '*.java')
 
 # 2. Empaquetar el JAR (cfe = clase principal + archivo + entrada)
-jar cfe simulacion-rng.jar Main -C build/classes .
+jar cfe simulacion-rng.jar Simulacion.Main -C build/classes .
 
 # 3. Ejecutar el JAR
 java -jar simulacion-rng.jar
@@ -122,7 +129,7 @@ mkdir build\classes
 javac -encoding UTF-8 -d build\classes $((Get-ChildItem src -Recurse -Filter *.java).FullName)
 
 # 2. Empaquetar el JAR
-jar cfe simulacion-rng.jar Main -C build\classes .
+jar cfe simulacion-rng.jar Simulacion.Main -C build\classes .
 
 # 3. Ejecutar el JAR
 java -jar simulacion-rng.jar
@@ -132,7 +139,7 @@ java -jar simulacion-rng.jar
 
 1. Abre el proyecto (`File > Open…`).
 2. Ve a `File > Project Structure > Artifacts > + > JAR > From modules with dependencies`.
-3. En **Main Class** selecciona `Main` y pulsa **OK**.
+3. En **Main Class** selecciona `Simulacion.Main` y pulsa **OK**.
 4. Construye el artefacto: `Build > Build Artifacts > simulacion-rng:jar > Build`.
 5. El JAR aparecerá en `out/artifacts/simulacion_rng_jar/simulacion-rng.jar`.
 
@@ -148,28 +155,45 @@ Al ejecutar verás el menú principal:
 
 ```
 ======================================
- ¡Bienvenido! Generadores de Números
-     Pseudoaleatorios (RNG)
+           SIMULACIÓN
+Generadores de Números Pseudoaleatorios
 ======================================
 
 --- MENÚ PRINCIPAL ---
+1) Generar números aleatorios
+2) Pruebas Estadísticas
+3) Salir
+Elige una opción (1-3):
+```
+
+- **1) Generar números aleatorios** abre el menú de generadores:
+
+```
+--- MENÚ DE GENERADORES ---
 1) Método de Cuadrados Medios
 2) Método de Productos Medios
 3) Método de Multiplicación Constante
 4) Método Congruencial Lineal
-5) Salir
-Elige una opción (1-5):
+5) Método Congruencial Aditivo
+6) Volver al menú principal
+Elige una opción (1-6):
 ```
+
+- **2) Pruebas Estadísticas** es el módulo de pruebas sobre los números
+  generados (actualmente en construcción, con el paquete `PruebasEstadisticas`
+  reservado para él).
 
 Pasos típicos:
 
-1. Elige un generador (1–5).
-2. Introduce la **semilla** (y parámetros propios del método, p. ej. la constante
-   o los coeficientes `a`, `c`, `m` del congruencial).
-3. Introduce la **cantidad N** de números:
+1. En el menú principal elige **1** (generar números aleatorios).
+2. En el menú de generadores elige un método (1–5).
+3. Introduce la **semilla** (y parámetros propios del método, p. ej. la constante
+   o los coeficientes `a`, `b`, `m` del congruencial, o las `n` semillas y el
+   módulo `m` del congruencial aditivo).
+4. Introduce la **cantidad N** de números:
    - `N > 0` → genera exactamente `N` números.
    - `N = 0` → genera en bucle hasta detectar un número repetido (**ciclo**).
-4. Revisa la tabla de resultados:
+5. Revisa la tabla de resultados:
 
 ```
 >> Cuadrados Medios
@@ -181,12 +205,13 @@ Pasos típicos:
 ...
 ```
 
-   > En **Productos Medios** la columna de estados anteriores muestra los **dos**
-   > valores previos que se multiplican.
+   > En **Productos Medios** y **Congruencial Aditivo** la columna de estados
+   > anteriores muestra los valores previos que participan en el cálculo.
 
-5. ¿Guardar la tabla en **CSV**? Responde `s` o `n`.
-6. ¿Generar **otra secuencia** con el mismo generador? `s` → pide una nueva
-   semilla y `N`; `n` → vuelve al menú principal.
+6. ¿Guardar la tabla en **CSV**? Responde `s` o `n`.
+7. ¿Generar **otra secuencia** con el mismo generador? `s` → pide una nueva
+   semilla y `N`; `n` → vuelve al menú de generadores, desde donde puedes
+   volver al menú principal con la opción **6**.
 
 ---
 
@@ -197,12 +222,15 @@ Pasos típicos:
 | Cuadrados Medios                  | Xᵢ = dígitos centrales de Xᵢ₋₁²                      | semilla                            |
 | Productos Medios                  | Xᵢ = dígitos centrales de Xᵢ₋₂ · Xᵢ₋₁                | semilla₁, semilla₂ (mismo tamaño)  |
 | Multiplicación Constante          | Xᵢ = dígitos centrales de k · Xᵢ₋₁                    | semilla, constante                  |
-| Congruencial Lineal               | Xᵢ = (a · Xᵢ₋₁ + c) mod m                             | semilla, a, c, m                    |
+| Congruencial Lineal               | Xᵢ = (a · Xᵢ₋₁ + b) mod m                             | semilla, a, b, m                    |
+| Congruencial Aditivo              | Xᵢ = (Xᵢ₋₁ + Xᵢ₋ₙ) mod m                             | n semillas, m                      |
 
 - **Cuadrados, Productos y Multiplicación Constante** normalizan con `10^d`,
   siendo `d` el número de dígitos de la semilla (dígitos adaptativos).
 - **Congruencial Lineal** admite **cualquier módulo `m` positivo**; el cálculo
-  `(a·X + c) mod m` se hace a prueba de desbordamiento.
+  `(a·X + b) mod m` se hace a prueba de desbordamiento.
+- **Congruencial Aditivo** pide al usuario el módulo `m` y `n` semillas; cada
+  estado es `(anterior + la n-ésima hacia atrás) mod m`, normalizando con `X/m`.
 
 ---
 
